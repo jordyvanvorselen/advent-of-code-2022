@@ -1,5 +1,6 @@
 use std::fs;
 
+#[derive(Clone)]
 enum Hand {
     Rock,
     Paper,
@@ -9,6 +10,22 @@ enum Hand {
 struct Move {
     me: Hand,
     opponent: Hand,
+}
+
+fn hand_to_win_from(opponent: &Hand) -> Hand {
+    match opponent {
+        Hand::Rock => Hand::Paper,
+        Hand::Paper => Hand::Scissors,
+        Hand::Scissors => Hand::Rock,
+    }
+}
+
+fn hand_to_lose_from(opponent: &Hand) -> Hand {
+    match opponent {
+        Hand::Rock => Hand::Scissors,
+        Hand::Paper => Hand::Rock,
+        Hand::Scissors => Hand::Paper,
+    }
 }
 
 fn hand_score(hand: &Hand) -> i32 {
@@ -38,9 +55,19 @@ fn result_score(a_move: &Move) -> i32 {
 
 fn hand_by_value(value: &str) -> Hand {
     match value {
-        "A" | "X" => Hand::Rock,
-        "B" | "Y" => Hand::Paper,
-        "C" | "Z" => Hand::Scissors,
+        "A" => Hand::Rock,
+        "B" => Hand::Paper,
+        "C" => Hand::Scissors,
+
+        _ => panic!("What?!"),
+    }
+}
+
+fn hand_by_strategy(opponent: &Hand, strategy: &str) -> Hand {
+    match strategy {
+        "X" => hand_to_lose_from(&opponent),
+        "Y" => (*opponent).clone(),
+        "Z" => hand_to_win_from(&opponent),
 
         _ => panic!("What?!"),
     }
@@ -56,8 +83,8 @@ fn get_moves(lines: Vec<&str>) -> Vec<Move> {
 
         let line: Vec<&str> = line.split(" ").collect();
 
-        let me = hand_by_value(line[1]);
         let opponent = hand_by_value(line[0]);
+        let me = hand_by_strategy(&opponent, line[1]);
 
         moves.push(Move { me, opponent })
     }
