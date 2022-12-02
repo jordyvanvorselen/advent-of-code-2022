@@ -13,11 +13,20 @@ impl Elf {
 fn main() {
     let contents = fs::read_to_string("./input/calories").expect("Could not read file!");
     let elves = get_elves(contents);
-    let calories: Vec<i32> = elves.iter().map(|elf| elf.total_calories()).collect();
 
-    let max_calories = calories.iter().max().unwrap();
+    let mut calories: Vec<i32> = elves.iter().map(|elf| elf.total_calories()).collect();
+    calories.sort();
 
-    println!("{max_calories}");
+    let index = calories.len() - 4;
+    let mut total = 0;
+
+    for (i, c) in calories.iter().enumerate() {
+        if i > calories.len() - 4 {
+            total = total + c;
+        }
+    }
+
+    println!("{}", total);
 }
 
 fn get_elves(contents: String) -> Vec<Elf> {
