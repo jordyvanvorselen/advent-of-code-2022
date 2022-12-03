@@ -7,6 +7,13 @@ struct Rucksack {
     second_part: String,
 }
 
+#[derive(Debug)]
+struct Group {
+    first_elf: String,
+    second_elf: String,
+    third_elf: String,
+}
+
 fn priorities() -> HashMap<String, i32> {
     let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let mut priorities: HashMap<String, i32> = HashMap::new();
@@ -18,33 +25,31 @@ fn priorities() -> HashMap<String, i32> {
     priorities
 }
 
-fn get_rucksacks(lines: Vec<&str>) -> Vec<Rucksack> {
-    let mut rucksacks: Vec<Rucksack> = Vec::new();
+fn get_groups(lines: Vec<&str>) -> Vec<Group> {
+    let mut groups: Vec<Group> = Vec::new();
+    let mut group: Vec<String> = Vec::new();
 
-    for line in lines {
-        if line.is_empty() {
-            continue;
+    lines.iter().enumerate().for_each(|(i, l)| {
+        group.push(l.to_string());
+
+        if (i + 1) % 3 == 0 {
+            groups.push(Group {
+                first_elf: group[0].clone(),
+                second_elf: group[1].clone(),
+                third_elf: group[2].clone(),
+            });
+            group = Vec::new();
         }
+    });
 
-        let (first, second) = line.split_at(line.chars().count() / 2);
-
-        let first_part = first.to_string();
-        let second_part = second.to_string();
-
-        rucksacks.push(Rucksack {
-            first_part,
-            second_part,
-        });
-    }
-
-    rucksacks
+    groups
 }
 
-fn matching_characters(a: &String, b: &String) -> String {
+fn matching_characters(a: &String, b: &String, c: &String) -> String {
     let mut matching: String = String::from("");
 
     a.chars().for_each(|character| match character {
-        _ if b.contains(character) && !matching.contains(character) => {
+        _ if b.contains(character) && c.contains(character) && !matching.contains(character) => {
             matching.push_str(&character.to_string())
         }
         _ => (),
@@ -57,12 +62,12 @@ fn main() {
     let contents = fs::read_to_string("./input/rucksacks").expect("Could not read file!");
     let lines: Vec<&str> = contents.split("\n").collect();
 
-    let rucksacks = get_rucksacks(lines);
+    let groups = get_groups(lines);
     let priorities = priorities();
 
-    let total_prio: i32 = rucksacks
+    let total_prio: i32 = groups
         .iter()
-        .map(|r| matching_characters(&r.first_part, &r.second_part))
+        .map(|g| matching_characters(&g.first_elf, &g.second_elf, &g.third_elf))
         .fold(0, |acc, curr| {
             let mut total = acc;
 
