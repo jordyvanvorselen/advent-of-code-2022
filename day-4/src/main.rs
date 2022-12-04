@@ -47,7 +47,7 @@ fn get_pairs_with_overlap(pairs: Vec<AssignmentPair>) -> Vec<AssignmentPair> {
 }
 
 fn vecs_overlap(a: &Vec<i32>, b: &Vec<i32>) -> bool {
-    b.iter().all(|item| a.contains(item))
+    b.iter().any(|item| a.contains(item))
 }
 
 fn main() {
